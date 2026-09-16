@@ -3,6 +3,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
+import os
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=600,
@@ -11,6 +12,7 @@ splitter = RecursiveCharacterTextSplitter(
 )
 
 embeddings = GoogleGenerativeAIEmbeddings(model = "gemini-embedding-001")
+
 
 def parse_split(document):
     if document.endswith(".pdf"):
@@ -35,4 +37,6 @@ def create_db(document):
 
 def update_db(document):
     chunks = parse_split(document)
-    pass
+    if os.path.exists("faiss_index"):
+        vector_store = FAISS.load_local("faiss_index")
+        vector_store.add_documents(documents=chunks)
