@@ -26,8 +26,7 @@ def parse_split(document):
             chunks = splitter.split_documents([documents])  
 
     return chunks          
-
-         
+       
 
 def create_db(document):
     chunks = parse_split(document)
@@ -38,5 +37,5 @@ def create_db(document):
 def update_db(document):
     chunks = parse_split(document)
     if os.path.exists("faiss_index"):
-        vector_store = FAISS.load_local("faiss_index")
+        vector_store = FAISS.load_local("faiss_index", embeddings=embeddings)
         vector_store.add_documents(documents=chunks)
