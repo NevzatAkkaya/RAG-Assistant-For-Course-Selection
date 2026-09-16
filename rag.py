@@ -1,0 +1,28 @@
+from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_community.vectorstores import FAISS
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+
+
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+vector_store = FAISS.load_local("faiss_index", embeddings)
+retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
+model = ChatGoogleGenerativeAI(model = "gemini-3.5-flash-lite")
+output_parser = StrOutputParser()
+
+prompt = ChatPromptTemplate.from_messages([ ("system",
+            """
+            Sen öğrencilere ders seçiminde yardımcı olan bir asistansın. 
+            Kullanıcının sorusunu sadece sana verilen context içerisindeki bilgileri kullanarak cevapla.
+            Context içerisinde cevap bulunmuyorsa: "Bu bilgi dokümanlarda bulunmuyor." şeklinde cevap ver."""),
+        ("human",
+         """CONTEXT: {context}
+            Soru: {question}""")])
+
+chain = prompt | model | output_parser
+
+def retrieve_generate(question):
+    documents = retriever.invoke(question)
+    context = "\n\n".join(document.page_content for document in documents)
+    response = chain.invoke({"context":context, "question":question})
+    return response
