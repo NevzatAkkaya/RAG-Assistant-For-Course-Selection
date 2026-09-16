@@ -1,8 +1,8 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter, HTMLHeaderTextSplitter
-import pandas as pd
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores import FAISS
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=600,
@@ -29,7 +29,9 @@ def parse_split(document):
 
 def create_db(document):
     chunks = parse_split(document)
-    pass
+    vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
+    vector_store.save_local("faiss_index")
+
 
 def update_db(document):
     chunks = parse_split(document)
