@@ -5,7 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 
 embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
-vector_store = FAISS.load_local("faiss_index", embeddings)
+vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
 model = ChatGoogleGenerativeAI(model = "gemini-3.5-flash-lite")
 output_parser = StrOutputParser()
@@ -23,6 +23,10 @@ chain = prompt | model | output_parser
 
 def retrieve_generate(question):
     documents = retriever.invoke(question)
-    context = "\n\n".join(document.page_content for document in documents)
+    context = "\n\n".join(
+    f"[Page {document.metadata.get('page', 'unknown')}]\n"
+    f"{document.page_content}"
+    for document in documents
+)
     response = chain.invoke({"context":context, "question":question})
     return response
