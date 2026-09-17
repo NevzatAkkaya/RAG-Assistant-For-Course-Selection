@@ -1,13 +1,13 @@
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_ollama import OllamaEmbeddings, ChatOllama
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 
-embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+embeddings = OllamaEmbeddings(model="bge-m3")
 vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
-model = ChatGoogleGenerativeAI(model = "gemini-3.5-flash-lite")
+model = ChatOllama(model="llama3.2")
 output_parser = StrOutputParser()
 
 prompt = ChatPromptTemplate.from_messages([ ("system",

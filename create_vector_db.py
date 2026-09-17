@@ -1,8 +1,9 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings
+
 import os
 
 splitter = RecursiveCharacterTextSplitter(
@@ -11,7 +12,7 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", ".", " ", ""]
 )
 
-embeddings = GoogleGenerativeAIEmbeddings(model = "gemini-embedding-001")
+embeddings = OllamaEmbeddings(model="bge-m3")
 
 
 def parse_split(document):

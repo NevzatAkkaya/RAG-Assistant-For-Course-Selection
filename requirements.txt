@@ -1,7 +1,8 @@
 langchain
-langchain-google-genai
+langchain_ollama
 python-dotenv
 langchain-community
 faiss-cpu
 langchain-text-splitters
 pypdf
+gradio
