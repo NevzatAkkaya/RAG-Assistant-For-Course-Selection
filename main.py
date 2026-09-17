@@ -2,25 +2,9 @@ import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+import gradio as gr
 
-load_dotenv()
+textbox = gr.Textbox()
+dropdown = gr.Dropdown()
 
-google_api_key = os.getenv("API_KEY")
-
-model = ChatGoogleGenerativeAI(
-    model = "gemini-2.5-flash-lite"
-)
-
-prompt = ChatPromptTemplate(
-    [
-        ("system", "You are an assistant who is tasked to explain subjets upon asked"),
-        ("human", """" Subject: {topic} """)
-
-    ]
-)
-
-user_prompt = "LLM nedir ?"
-
-response = model.invoke(user_prompt)
-
-print(response.content)
+gr.load_chat("http://localhost:11434/v1/", model="llama3.2", token="***").launch()
