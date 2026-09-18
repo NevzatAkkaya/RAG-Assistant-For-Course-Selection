@@ -15,7 +15,7 @@ splitter = RecursiveCharacterTextSplitter(
 embeddings = OllamaEmbeddings(model="bge-m3")
 
 def rand_key(key):
-    keys = map(lambda x: x.split("_")[0], os.listdir("db"))
+    keys = os.listdir("db")
     if key + str(len(key)) in keys:
         return rand_key(key+"1")
     else:
@@ -36,19 +36,20 @@ def parse_split(document):
        
 
 def create_db(document, key="default"):
-    keys = map(lambda x: x.split("_")[0], os.listdir("db"))
+    keys = os.listdir("db")
     chunks = parse_split(document)
     vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
     if key in keys:
-        vector_store.save_local(rand_key(key))
+        vector_store.save_local(os.path.join("db",rand_key(key)))
     else:
-        vector_store.save_local(key)
+        vector_store.save_local(os.path.join("db",key))
 
 
-def update_db(document, key=None):
+def update_db(document, key="default"):
     chunks = parse_split(document)
-    if os.path.exists(os.path.join("db",key + "_db_index")):
-        vector_store = FAISS.load_local("faiss_index", embeddings=embeddings, allow_dangerous_deserialization=True)
+    if os.path.exists(os.path.join("db",key,"index.faiss")):
+        vector_store = FAISS.load_local(os.path.join("db",key), embeddings=embeddings, allow_dangerous_deserialization=True)
         vector_store.add_documents(documents=chunks)
+        vector_store.save_local(os.path.join("db",key))
     else:
-        create_db(document)
+        create_db(document, key)
