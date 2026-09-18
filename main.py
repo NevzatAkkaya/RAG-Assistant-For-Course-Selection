@@ -5,7 +5,8 @@ from create_vector_db import update_db
 
 
 def chat(message, history):
-    return retrieve_generate(message)
+    response, context = retrieve_generate(message)
+    return response
 
 
 def upload_file(file):
@@ -15,6 +16,8 @@ def upload_file(file):
     update_db(file)
     return f"Added {file}"
 
+def select_school(val):
+    return val
 
 with gr.Blocks() as demo:
 
@@ -34,12 +37,18 @@ with gr.Blocks() as demo:
             type="filepath"
         )
 
-        upload_button = gr.Button("Add to knowledge base")
+        upload_button = gr.Button("Transkript Ekle")
 
     upload_status = gr.Textbox(
         label="Status",
         interactive=False
     )
+
+    dropdown = gr.Dropdown(
+    choices=["BOUN", "ITU", "IU", "METU"],
+    label="University",
+    value="BOUN"
+    )  
 
     msg.submit(
         chat,
@@ -52,6 +61,7 @@ with gr.Blocks() as demo:
         inputs=file,
         outputs=upload_status
     )
+
 
 
 demo.launch(share=False)

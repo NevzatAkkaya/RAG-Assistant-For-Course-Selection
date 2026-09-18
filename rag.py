@@ -27,6 +27,6 @@ def retrieve_generate(question):
     f"[Page {document.metadata.get('page', 'unknown')}]\n"
     f"{document.page_content}"
     for document in documents
-)
+    )
     response = chain.invoke({"context":context, "question":question})
-    return response
+    return (response, context)

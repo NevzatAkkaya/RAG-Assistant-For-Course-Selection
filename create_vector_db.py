@@ -14,6 +14,12 @@ splitter = RecursiveCharacterTextSplitter(
 
 embeddings = OllamaEmbeddings(model="bge-m3")
 
+def rand_key(key):
+    keys = map(lambda x: x.split("_")[0], os.listdir("db"))
+    if key + str(len(key)) in keys:
+        return rand_key(key+"1")
+    else:
+        return key + str(len(key))
 
 def parse_split(document):
     if document.endswith(".pdf"):
@@ -29,15 +35,19 @@ def parse_split(document):
     return chunks          
        
 
-def create_db(document):
+def create_db(document, key="default"):
+    keys = map(lambda x: x.split("_")[0], os.listdir("db"))
     chunks = parse_split(document)
     vector_store = FAISS.from_documents(documents=chunks, embedding=embeddings)
-    vector_store.save_local("faiss_index")
+    if key in keys:
+        vector_store.save_local(rand_key(key))
+    else:
+        vector_store.save_local(key)
 
 
-def update_db(document):
+def update_db(document, key=None):
     chunks = parse_split(document)
-    if os.path.exists("faiss_index"):
+    if os.path.exists(os.path.join("db",key + "_db_index")):
         vector_store = FAISS.load_local("faiss_index", embeddings=embeddings, allow_dangerous_deserialization=True)
         vector_store.add_documents(documents=chunks)
     else:
