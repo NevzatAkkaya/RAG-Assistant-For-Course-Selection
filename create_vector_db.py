@@ -40,3 +40,5 @@ def update_db(document):
     if os.path.exists("faiss_index"):
         vector_store = FAISS.load_local("faiss_index", embeddings=embeddings, allow_dangerous_deserialization=True)
         vector_store.add_documents(documents=chunks)
+    else:
+        create_db(document)
