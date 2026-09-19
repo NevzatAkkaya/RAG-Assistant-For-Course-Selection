@@ -4,8 +4,8 @@ from rag import retrieve_generate
 from create_vector_db import update_db
 
 
-def chat(message, history):
-    response, context = retrieve_generate(message)
+def chat(message, history, university):
+    response, context = retrieve_generate(message, university)
     return response
 
 
@@ -52,7 +52,7 @@ with gr.Blocks() as demo:
 
     msg.submit(
         chat,
-        inputs=[msg, chatbot],
+        inputs=[msg, chatbot, dropdown],
         outputs=chatbot
     )
 

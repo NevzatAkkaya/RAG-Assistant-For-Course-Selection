@@ -2,7 +2,7 @@ from langchain_ollama import OllamaEmbeddings, ChatOllama
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-
+import os
 
 embeddings = OllamaEmbeddings(model="bge-m3")
 model = ChatOllama(model="llama3.2")
@@ -19,8 +19,8 @@ prompt = ChatPromptTemplate.from_messages([ ("system",
 
 chain = prompt | model | output_parser
 
-def retrieve_generate(question):
-    vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+def retrieve_generate(question, db_key="default"):
+    vector_store = FAISS.load_local(os.path.join("db",db_key), embeddings, allow_dangerous_deserialization=True)
     retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
     documents = retriever.invoke(question)
     context = "\n\n".join(
