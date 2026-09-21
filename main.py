@@ -5,9 +5,12 @@ from create_vector_db import update_db
 
 
 def chat(message, history, university):
-    response, context = retrieve_generate(message, university)
-    return response
+    response, context = retrieve_generate(message, university, history)
+    parsed = parse_context(context)
+    return response, parsed
 
+def parse_context(context):
+    return list(map(lambda y: y.split(" ")[:2],filter(lambda x: True if x.startswith("Page") and len(x.split(" ")) < 3 else False, context.split("\n"))))
 
 def upload_file(file):
     if file is None:
@@ -15,9 +18,6 @@ def upload_file(file):
 
     update_db(file)
     return f"Added {file}"
-
-def select_school(val):
-    return val
 
 with gr.Blocks() as demo:
 
@@ -44,6 +44,11 @@ with gr.Blocks() as demo:
         interactive=False
     )
 
+    source_text = gr.Textbox(
+        label="Source Files",
+        interactive=False
+    )
+
     dropdown = gr.Dropdown(
     choices=["BOUN", "ITU", "IU", "METU"],
     label="University",
@@ -53,7 +58,7 @@ with gr.Blocks() as demo:
     msg.submit(
         chat,
         inputs=[msg, chatbot, dropdown],
-        outputs=chatbot
+        outputs=[chatbot, source_text]
     )
 
     upload_button.click(

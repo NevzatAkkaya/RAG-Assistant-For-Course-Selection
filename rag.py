@@ -19,7 +19,7 @@ prompt = ChatPromptTemplate.from_messages([ ("system",
 
 chain = prompt | model | output_parser
 
-def retrieve_generate(question, db_key="default"):
+def retrieve_generate(question, db_key="default", history=[]):
     vector_store = FAISS.load_local(os.path.join("db",db_key), embeddings, allow_dangerous_deserialization=True)
     retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
     documents = retriever.invoke(question)
