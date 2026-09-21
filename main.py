@@ -10,7 +10,7 @@ def chat(message, history, university):
     return response, parsed
 
 def parse_context(context):
-    return list(map(lambda y: y.split(" ")[:2],filter(lambda x: True if x.startswith("Page") and len(x.split(" ")) < 3 else False, context.split("\n"))))
+    return "".join((str(line[0]) + str(line[1])).strip("[]") for line in list(map(lambda y: y.split(" ")[:2],filter(lambda x: True if x.startswith("[Page") and len(x.split(" ")) < 3 else False, context.split("\n")))))
 
 def upload_file(file):
     if file is None:
