@@ -1,12 +1,7 @@
 import gradio as gr
 from rag import retrieve_generate
 from create_vector_db import update_db
-
-
-def chat(message, history, university):
-    response, context = retrieve_generate(message, university, history)
-    parsed = parse_context(context)
-    return response, parsed
+from langchain_core.messages import HumanMessage, AIMessage
 
 def parse_context(context):
     metadata = list(filter(lambda x: x.startswith("["), context.split("\n")))
@@ -16,11 +11,50 @@ def parse_context(context):
             concat.append(metadata[i-1].strip("[]") + " " + metadata[i].strip("[]"))
     return "".join(line + "\n" for line in concat)
 
+
+def convert_history(history):
+    messages = []
+
+    for message in history:
+        if message["role"] == "user":
+            messages.append(HumanMessage(content=message["content"]))
+        elif message["role"] == "assistant":
+            messages.append(AIMessage(content=message["content"]))
+
+    return messages
+
+
+def chat(message, history, university):
+
+    history = history or []
+    langchain_history = convert_history(history)
+
+    response, context = retrieve_generate(
+        message,
+        university,
+        langchain_history
+    )
+
+    parsed = parse_context(context)
+
+    history.append({
+        "role": "user",
+        "content": message
+    })
+
+    history.append({
+        "role": "assistant",
+        "content": response
+    })
+
+    return history, parsed
+
+
 def upload_file(file):
     if file is None:
         return "No file selected."
 
-    update_db(file)
+    update_db(file, key=dropdown.value)
     return f"Added {file}"
 
 with gr.Blocks() as demo:
@@ -41,7 +75,7 @@ with gr.Blocks() as demo:
             type="filepath"
         )
 
-        upload_button = gr.Button("Transkript Ekle")
+        upload_button = gr.Button("Dosya Ekle")
 
     upload_status = gr.Textbox(
         label="Status",

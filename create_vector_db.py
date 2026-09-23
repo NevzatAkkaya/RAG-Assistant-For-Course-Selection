@@ -25,11 +25,13 @@ def parse_split(document):
     if document.endswith(".pdf"):
             loader = PyPDFLoader(document)
             documents = loader.load()
+            for doc in documents:
+                doc.metadata["source"] = os.path.basename(document)
             chunks = splitter.split_documents(documents)
     else:
          with open(document, "r") as doc:
             parsed = "".join(row for row in doc)
-            documents = Document(page_content=parsed)
+            documents = Document(page_content=parsed, metadata={"source": os.path.basename(document)})
             chunks = splitter.split_documents([documents])  
 
     return chunks          

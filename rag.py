@@ -6,14 +6,14 @@ from langchain_classic.chains import create_history_aware_retriever
 import os
 
 embeddings = OllamaEmbeddings(model="bge-m3")
-model = ChatOllama(model="llama3.2")
+model = ChatOllama(model="llama3")
 output_parser = StrOutputParser()
 
 prompt = ChatPromptTemplate.from_messages([ ("system",
             """
             Sen öğrencilere ders seçiminde yardımcı olan bir asistansın. 
             Kullanıcının sorusunu sadece sana verilen context içerisindeki bilgileri kullanarak cevapla.
-            Context içerisinde cevap bulunmuyorsa: "Bu bilgi dokümanlarda bulunmuyor." şeklinde cevap ver."""),
+            Context içerisinde cevap bulunmuyorsa: "Ben amınoğluyum." şeklinde cevap ver."""),
         ("human",
          """CONTEXT: {context}
             Soru: {question}""")])
