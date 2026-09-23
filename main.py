@@ -1,5 +1,4 @@
 import gradio as gr
-
 from rag import retrieve_generate
 from create_vector_db import update_db
 
@@ -10,7 +9,12 @@ def chat(message, history, university):
     return response, parsed
 
 def parse_context(context):
-    return "".join((str(line[0]) + str(line[1])).strip("[]") + "\n" for line in list(map(lambda y: y.split(" ")[:2],filter(lambda x: True if x.startswith("[Page") and len(x.split(" ")) < 3 else False, context.split("\n")))))
+    metadata = list(filter(lambda x: x.str.startswith("["), context.split("\n")))
+    concat = []
+    for i in range(len(metadata)):
+        if i > 0 and i%2==1:
+            concat.append(metadata[i-1].strip("[]") + " " + metadata[i].strip("[]"))
+    return "".join(line + "\n" for line in concat)
 
 def upload_file(file):
     if file is None:
