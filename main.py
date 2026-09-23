@@ -9,7 +9,7 @@ def chat(message, history, university):
     return response, parsed
 
 def parse_context(context):
-    metadata = list(filter(lambda x: x.str.startswith("["), context.split("\n")))
+    metadata = list(filter(lambda x: x.startswith("["), context.split("\n")))
     concat = []
     for i in range(len(metadata)):
         if i > 0 and i%2==1:

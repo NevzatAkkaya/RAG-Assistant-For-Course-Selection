@@ -24,7 +24,7 @@ def retrieve_generate(question, db_key="default", history=None):
     retriever = vector_store.as_retriever(search_type = "similarity", search_kwargs = {"k":3})
     documents = retriever.invoke(question)
     context = "\n\n".join(
-    f"[Source {document.metadata.get("source", "unknown")}]\n"
+    f"[Source {document.metadata.get('source', 'unknown')}]\n"
     f"[Page {document.metadata.get('page', 'unknown')}]\n"
     f"{document.page_content}"
     for document in documents
